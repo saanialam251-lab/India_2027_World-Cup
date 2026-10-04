@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies (Capacitor is installed here even if package.json lacks it)
         run: |
           npm install
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/preferences@6
 
       - name: Build the web app
         run: npx vite build --base=./
