@@ -13,10 +13,10 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
 
   const submit = async e => {
     e.preventDefault(); setError("");
-    const name = f.name.trim(), email = f.email.trim(), phone = f.phone.trim();
+    const name = f.name.trim(), email = f.email.trim(), phone = f.phone.replace(/\D/g, "");
     if (!name) return setError("Please enter your name.");
     if (!/^\S+@\S+\.\S+$/.test(email)) return setError("Please enter a valid email address.");
-    if (phone.replace(/\D/g, "").length < 10) return setError("Please enter a valid 10-digit phone number.");
+    if (phone.length !== 10) return setError("Please enter a valid 10-digit phone number.");
     setBusy(true);
     const squad = { selected, cap, vc, wk, fanName: name, fanEmail: email, fanPhone: phone };
     saveSquad(squad); onSaved?.();            // saved first, so the email includes your own squad in the totals
@@ -54,7 +54,7 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
           <div className="grid gap-3">
             <input value={f.name} onChange={set("name")} placeholder="Your name" autoComplete="name" className="field" />
             <input type="email" value={f.email} onChange={set("email")} placeholder="Your email" autoComplete="email" className="field" />
-            <input type="tel" value={f.phone} onChange={set("phone")} placeholder="Phone number" autoComplete="tel" className="field" />
+            <input type="tel" inputMode="numeric" maxLength={10} pattern="[0-9]{10}" value={f.phone} onChange={e => setF({ ...f, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder="10-digit phone number" autoComplete="tel" className="field" />
           </div>
           {error && <p role="alert" className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2.5">{error}</p>}
           <div className="flex gap-3 justify-end">
