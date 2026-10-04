@@ -1,9 +1,7 @@
-import { useMemo } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
 import { Users, Crown, Shield, Trophy } from "lucide-react";
 import { byId, ROLE_COLOR, ROLE_LABEL } from "../data/players";
-import { loadSquads } from "../utils/storage";
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 ChartJS.defaults.font.family = "Poppins, sans-serif";
 ChartJS.defaults.color = "rgba(255,255,255,.75)";
@@ -29,10 +27,10 @@ const Tile = ({ id, rank }) => { const p = byId[id], c = ROLE_COLOR[p.role];
     <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-3 pt-2" style={{ background: `linear-gradient(160deg,${c},#06265f)`, clipPath: "polygon(30% 0,38% 6%,62% 6%,70% 0,100% 18%,88% 38%,76% 30%,76% 100%,24% 100%,24% 30%,12% 38%,0 18%)" }}>
       <span className="font-oswald text-2xl leading-none">{rank}</span><span className="text-[9px] font-semibold mt-1 leading-tight uppercase">{p.name.split(" ").pop()}</span></div></div>); };
 
-export default function AnalyticsDashboard({ tick }) {
-  const squads = useMemo(loadSquads, [tick]), n = squads.length;
+export default function AnalyticsDashboard({ squads = [] }) {
+  const n = squads.length;
   if (!n) return (<section className="glass rounded-3xl p-8 mt-10 text-center"><h2 className="font-oswald text-2xl">Fan Analytics</h2>
-    <p className="text-white/55 text-sm mt-2">No squads yet. Submit yours and the charts will appear here.</p></section>);
+    <p className="text-white/55 text-sm mt-2">No fan has submitted a squad yet. Be the first and the charts will appear here.</p></section>);
 
   const picks = tally(squads, s => s.selected), caps = tally(squads, s => [s.cap]), vcs = tally(squads, s => [s.vc]), wks = tally(squads, s => [s.wk]);
   const t15 = picks.slice(0, 15), pct = v => Math.round(v / n * 100);
@@ -44,10 +42,10 @@ export default function AnalyticsDashboard({ tick }) {
 
   return (<section className="glass rounded-3xl p-4 sm:p-6 md:p-8 mt-10 overflow-hidden">
     <div className="flex flex-wrap items-end justify-between gap-2 mb-6"><div><h2 className="font-oswald text-3xl">Fan Analytics</h2>
-      <p className="text-sm text-white/55">Live from {n} squad{n > 1 ? "s" : ""} submitted on this device</p></div><div className="tricolour h-1 w-24 rounded-full" /></div>
+      <p className="text-sm text-white/55">Live from {n} fan{n > 1 ? "s" : ""} who submitted a squad</p></div><div className="tricolour h-1 w-24 rounded-full" /></div>
 
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-      <Stat icon={Users} label="Squads submitted" value={n} sub={`${picks.length} different players picked`} />
+      <Stat icon={Users} label="Fans submitted" value={n} sub={`${picks.length} different players picked`} />
       <Stat icon={Crown} label="Top captain" value={byId[caps[0][0]].name.split(" ").pop()} sub={`${pct(caps[0][1])}% of fans`} />
       <Stat icon={Shield} label="Top vice-captain" value={byId[vcs[0][0]].name.split(" ").pop()} sub={`${pct(vcs[0][1])}% of fans`} />
       <Stat icon={Trophy} label="Top keeper" value={byId[wks[0][0]].name.split(" ").pop()} sub={`${pct(wks[0][1])}% of fans`} />
@@ -72,4 +70,4 @@ export default function AnalyticsDashboard({ tick }) {
           <div className="flex flex-wrap gap-1 justify-center">{ids.map((id, i) => <Tile key={id} id={id} rank={i + 1} />)}</div></div>))}
     </div>
   </section>);
-    }
+      }
