@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { UserCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { byId, count, RULES } from "./data/players";
@@ -31,8 +31,11 @@ const groupOf = (id) => {
   return r === "fast" || r === "spin" ? "bowl" : r;
 };
 
+const PlayerGridM = memo(PlayerGrid), AnalyticsM = memo(AnalyticsDashboard), HeroM = memo(HeroJerseys);
+
 export default function App() {
   const [sel, setSel] = useState([]);
+  const selRef = useRef(sel); selRef.current = sel;   // lets pick/blockReason stay the same function, so the big player list does not redraw when a pop-up opens
   const [toast, setToast] = useState(null);
   const [shake, setShake] = useState(0);
 
@@ -74,7 +77,8 @@ export default function App() {
   const onLogout = () => { clearSession(); setSession(null); setAuth(null); };
   const finalize = () => { if (!session) { setAuth("login"); notify("Please log in to send your squad", true); } else setModal(true); };
 
-  const blockReason = (id) => {
+  const blockReason = useCallback((id) => {
+    const sel = selRef.current;
     const group = groupOf(id);
     const nextCount = count([...sel, id]);
 
@@ -87,9 +91,10 @@ export default function App() {
     }
 
     return "";
-  };
+  }, []);
 
-  const pick = (id) => {
+  const pick = useCallback((id) => {
+    const sel = selRef.current;
     // Remove player
     if (sel.includes(id)) {
       setSel(sel.filter((x) => x !== id));
@@ -112,7 +117,7 @@ export default function App() {
     }
 
     setSel([...sel, id]);
-  };
+  }, []);
 
   const c = count(sel);
 
@@ -178,12 +183,12 @@ export default function App() {
       <BackgroundFX />
 
       <button onClick={() => setAuth("login")} aria-label={session ? "My account" : "Login or create account"}
-        className="fixed left-3 z-30 grid place-items-center w-11 h-11 rounded-full glass backdrop-blur text-white/90 active:scale-95 transition"
+        className="fixed left-3 z-30 grid place-items-center w-11 h-11 rounded-full glass bg-[#0a1630]/90 text-white/90 active:scale-95 transition"
         style={{ top: "calc(env(safe-area-inset-top) + 12px)" }}>
         {session ? <span className="grid place-items-center w-8 h-8 rounded-full bg-[#FF9933] text-[#050d1f] font-oswald text-sm">{session.name.trim()[0]?.toUpperCase()}</span> : <UserCircle size={28} />}
       </button>
 
-      <HeroJerseys
+      <HeroM
         step={go ? 2 : ready ? 1 : 0}
         fans={community.length}
       />
@@ -193,7 +198,7 @@ export default function App() {
 
           {/* PLAYER GRID */}
           <div className="flex-1 min-w-0">
-            <PlayerGrid
+            <PlayerGridM
               selected={sel}
               onPick={pick}
               blockReason={blockReason}
@@ -222,7 +227,7 @@ export default function App() {
         </div>
 
         {/* ANALYTICS */}
-        <AnalyticsDashboard squads={community} />
+        <AnalyticsM squads={community} />
       </main>
 
       {/* TOAST */}
@@ -271,4 +276,4 @@ export default function App() {
       </AnimatePresence>
     </>
   );
-    }
+}
