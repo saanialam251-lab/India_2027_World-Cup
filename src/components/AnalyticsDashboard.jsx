@@ -65,7 +65,7 @@ export default function AnalyticsDashboard({ squads = [] }) {
     <div className="grid md:grid-cols-3 gap-4 mb-6"><Leaders title="Captain choice" rows={caps} n={n} /><Leaders title="Vice-captain choice" rows={vcs} n={n} /><Leaders title="Wicket-keeper choice" rows={wks} n={n} /></div>
 
     <div className="grid lg:grid-cols-2 gap-6">
-      {[["Fans' Ultimate 15", picks.slice(0, 15).map(([id]) => id)], ["Fans' Ultimate Playing XI", xi]].map(([title, ids]) => (
+      {[["Fans' Ultimate 15", picks.slice(0, 15).map(([id]) => id)] => (
         <div key={title} className="rounded-2xl border border-white/10 bg-white/[.04] p-4 sm:p-5 min-w-0 overflow-hidden rise"><h3 className="text-sm font-semibold mb-4">{title}</h3>
           <div className="flex flex-wrap gap-1 justify-center">{ids.map((id, i) => <Tile key={id} id={id} rank={i + 1} />)}</div></div>))}
     </div>
