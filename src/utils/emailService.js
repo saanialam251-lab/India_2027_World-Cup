@@ -47,23 +47,4 @@ const crlf = t => t.replace(/\r?\n/g, "\r\n");
 export const mailtoUrl = m => `mailto:${m.to}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(crlf(m.body))}`;
 export const gmailUrl = m => `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(m.to)}&su=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
 
-// 1) Try the email app on this device. 2) If nothing took over (window never lost focus),
-// open Gmail's compose window in the browser. 3) If the browser blocks that, the caller shows
-// "Open in Gmail" / "Copy" buttons. Resolves to "app" | "gmail" | "blocked".
-export function sendSquad(squad) {
-  const mail = buildEmail(squad);
-  return new Promise(resolve => {
-    let left = false;
-    const mark = () => { left = true; };
-    window.addEventListener("blur", mark);
-    document.addEventListener("visibilitychange", mark);
-    window.location.href = mailtoUrl(mail);
-    setTimeout(() => {
-      window.removeEventListener("blur", mark);
-      document.removeEventListener("visibilitychange", mark);
-      if (left) return resolve({ via: "app", mail });
-      const w = window.open(gmailUrl(mail), "_blank", "noopener");
-      resolve({ via: w ? "gmail" : "blocked", mail });
-    }, 1800);
-  });
-}
+// The user now chooses how to send (see SubmitModal): email app (mailto) or Gmail in the browser.
