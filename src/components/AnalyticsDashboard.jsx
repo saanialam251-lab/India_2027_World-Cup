@@ -34,8 +34,6 @@ export default function AnalyticsDashboard({ squads = [] }) {
 
   const picks = tally(squads, s => s.selected), caps = tally(squads, s => [s.cap]), vcs = tally(squads, s => [s.vc]), wks = tally(squads, s => [s.wk]);
   const t15 = picks.slice(0, 15), pct = v => Math.round(v / n * 100);
-  let xi = picks.slice(0, 11).map(([id]) => id);
-  if (!xi.some(id => byId[id].role === "wk")) { const k = picks.find(([id]) => byId[id].role === "wk"); if (k) xi = [...xi.slice(0, 10), k[0]]; }
   const mix = { bat: 0, wk: 0, ar: 0, fast: 0, spin: 0 };
   squads.forEach(s => s.selected.forEach(id => { if (byId[id]) mix[byId[id].role]++; }));
   const roles = Object.keys(mix);
@@ -64,10 +62,10 @@ export default function AnalyticsDashboard({ squads = [] }) {
 
     <div className="grid md:grid-cols-3 gap-4 mb-6"><Leaders title="Captain choice" rows={caps} n={n} /><Leaders title="Vice-captain choice" rows={vcs} n={n} /><Leaders title="Wicket-keeper choice" rows={wks} n={n} /></div>
 
-    <div className="grid lg:grid-cols-2 gap-6">
-      {[["Fans' Ultimate 15", picks.slice(0, 15).map(([id]) => id)] => (
+    <div className="grid gap-6">
+      {[["Fans' Ultimate 15", picks.slice(0, 15).map(([id]) => id)]].map(([title, ids]) => (
         <div key={title} className="rounded-2xl border border-white/10 bg-white/[.04] p-4 sm:p-5 min-w-0 overflow-hidden rise"><h3 className="text-sm font-semibold mb-4">{title}</h3>
           <div className="flex flex-wrap gap-1 justify-center">{ids.map((id, i) => <Tile key={id} id={id} rank={i + 1} />)}</div></div>))}
     </div>
   </section>);
-      }
+    }
