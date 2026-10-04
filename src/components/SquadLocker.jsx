@@ -29,7 +29,7 @@ export default function SquadLocker({ selected, onRemove, shake, cap, vc, wk, se
     {!selected.length ? <p className="text-sm text-white/50 text-center py-6 border border-dashed border-white/15 rounded-2xl">Tap players on the left to add them to your squad.</p> : <>
       <p className="text-[11px] text-white/45 mb-2">Tap <b className="text-white/70">C</b>, <b className="text-white/70">VC</b> or <b className="text-white/70">WK</b> to assign roles.</p>
       <ul className="grid gap-1.5 max-h-[46vh] overflow-y-auto scroll-thin pr-1"><AnimatePresence initial={false}>{sorted.map(id => { const p = byId[id], color = ROLE_COLOR[p.role];
-        return <motion.li layout key={id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+        return <motion.li key={id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
           className="flex items-center gap-2.5 bg-white/[.04] rounded-xl pl-2 pr-1.5 py-1.5 text-sm">
           <span className="grid place-items-center shrink-0 w-7 h-7 rounded-full text-[11px] font-oswald" style={{ background: `${color}26`, color }}>{initials(p.name)}</span>
           <span className="flex-1 min-w-0"><span className="block truncate leading-tight">{p.name}</span><span className="text-[11px]" style={{ color }}>{ROLE_LABEL[p.role]}</span></span>
@@ -43,4 +43,4 @@ export default function SquadLocker({ selected, onRemove, shake, cap, vc, wk, se
     <motion.button whileHover={go ? { scale: 1.02 } : {}} whileTap={go ? { scale: .98 } : {}} disabled={!go} onClick={onFinalize}
       className="mt-4 w-full bg-[#0F52BA] disabled:bg-white/10 disabled:text-white/40 disabled:shadow-none rounded-xl py-3 font-semibold shadow-[0_10px_30px_rgba(15,82,186,.4)] transition-colors">Finalize Your Squad</motion.button>
   </motion.div>);
-}
+    }
