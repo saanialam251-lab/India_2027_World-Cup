@@ -43,4 +43,4 @@ export default function SquadLocker({ selected, onRemove, shake, cap, vc, wk, se
     <motion.button whileHover={go ? { scale: 1.02 } : {}} whileTap={go ? { scale: .98 } : {}} disabled={!go} onClick={onFinalize}
       className="mt-4 w-full bg-[#0F52BA] disabled:bg-white/10 disabled:text-white/40 disabled:shadow-none rounded-xl py-3 font-semibold shadow-[0_10px_30px_rgba(15,82,186,.4)] transition-colors">Finalize Your Squad</motion.button>
   </motion.div>);
-}
+      }
