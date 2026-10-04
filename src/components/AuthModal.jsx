@@ -90,4 +90,4 @@ export default function AuthModal({ start, session, onClose, onLoggedIn, onLogou
       </div>
       <AnimatePresence>{popup && <Popup kind={popup} onClose={() => setPopup(null)} onCreate={() => { setPopup(null); go("create"); }} />}</AnimatePresence>
     </motion.div></motion.div>);
-                                                                   }
+}
