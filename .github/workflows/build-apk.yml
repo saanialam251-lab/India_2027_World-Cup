@@ -20,12 +20,19 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Install and build the web app
+      - name: Install dependencies (Capacitor is installed here even if package.json lacks it)
         run: |
           npm install
-          npm run build
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
 
-      - name: Create the Android project and copy the web build into it
+      - name: Build the web app
+        run: npx vite build --base=./
+
+      - name: Create Capacitor config if it is missing
+        run: |
+          [ -f capacitor.config.json ] || echo '{"appId":"com.india2027.squadlab","appName":"India 2027 Squad Lab","webDir":"dist"}' > capacitor.config.json
+
+      - name: Create the Android project
         run: |
           npx cap add android
           npx cap sync android
