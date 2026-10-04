@@ -1,5 +1,4 @@
 import { byId, ROLE_LABEL } from "../data/players";
-import { loadSquads } from "./storage";
 
 // Change this one line if the BCCI gives you a dedicated address for fan suggestions.
 export const BCCI_EMAIL = "office@bcci.tv";
@@ -12,8 +11,8 @@ const top = (squads, pick) => {
 const lead = (squads, key) => { const r = top(squads, s => [s[key]]); return r.length ? `${byId[r[0][0]].name} (${r[0][1]} of ${squads.length} fans)` : "-"; };
 
 // Builds the full written email from the fan's details, their 15, and the community numbers so far.
-export function buildEmail({ selected, cap, vc, wk, fanName, fanEmail, fanPhone }) {
-  const squads = loadSquads(), total = squads.length;
+export function buildEmail({ selected, cap, vc, wk, fanName, fanEmail, fanPhone }, squads = []) {
+  const total = squads.length;
   const tag = id => [id === cap && "Captain", id === vc && "Vice-Captain", id === wk && "Wicket-Keeper"].filter(Boolean).join(", ");
   const mine = selected.map((id, i) => `${i + 1}. ${byId[id].name} - ${ROLE_LABEL[byId[id].role]}${tag(id) ? ` (${tag(id)})` : ""}`).join("\n");
   const fans = top(squads, s => s.selected).slice(0, 15).map(([id, n], i) => `${i + 1}. ${byId[id].name} - in ${n} of ${total} fan squads (${Math.round(n / total * 100)}%)`).join("\n");
