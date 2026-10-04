@@ -1,20 +1,18 @@
 import { Preferences } from "@capacitor/preferences";
-// Every submitted squad (name, email, phone, 15 players, C/VC/WK) is kept on this device,
-// in localStorage AND in the app's native Preferences, so it survives restarts.
-const KEY = "india2027-squads";
-// One-time wipe: clears all squads saved by earlier versions (bump the number to wipe again).
-const RESET = "india2027-reset-1";
-let justReset = false;
-try { if (!localStorage.getItem(RESET)) { localStorage.removeItem("india2027-squads"); localStorage.setItem(RESET, "1"); justReset = true; } } catch {}
-export const loadSquads = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
-const write = list => { const v = JSON.stringify(list); try { localStorage.setItem(KEY, v); } catch {} Preferences.set({ key: KEY, value: v }).catch(() => {}); };
-export const saveSquad = squad => write([...loadSquads(), { ...squad, at: Date.now() }]);
-// Called once at start-up: restores from whichever copy has more squads.
+// Accounts and squads live on the server. The phone only remembers who is logged in (and the last community numbers).
+const SESSION = "india2027-session", COMMUNITY = "india2027-community";
+// Old versions kept squads only on the device; those are removed.
+try { localStorage.removeItem("india2027-squads"); } catch {}
+Preferences.remove({ key: "india2027-squads" }).catch(() => {});
+
+export const getSession = () => { try { return JSON.parse(localStorage.getItem(SESSION)); } catch { return null; } };
+export const saveSession = s => { const v = JSON.stringify(s); try { localStorage.setItem(SESSION, v); } catch {} Preferences.set({ key: SESSION, value: v }).catch(() => {}); };
+export const clearSession = () => { try { localStorage.removeItem(SESSION); } catch {} Preferences.remove({ key: SESSION }).catch(() => {}); };
+export const loadCommunity = () => { try { return JSON.parse(localStorage.getItem(COMMUNITY)) || []; } catch { return []; } };
+export const saveCommunity = l => { try { localStorage.setItem(COMMUNITY, JSON.stringify(l)); } catch {} };
+
+// Called once at start-up: if the WebView's localStorage was wiped but the native copy survived, bring the login back.
 export async function restoreSquads() {
-  try {
-    if (justReset) { await Preferences.remove({ key: KEY }); return; }
-    const { value } = await Preferences.get({ key: KEY });
-    const saved = JSON.parse(value || "[]"), local = loadSquads();
-    if (saved.length > local.length) localStorage.setItem(KEY, JSON.stringify(saved)); else if (local.length > saved.length) write(local);
-  } catch {}
+  try { if (getSession()) return getSession(); const { value } = await Preferences.get({ key: SESSION }); const s = JSON.parse(value || "null"); if (s?.token) { try { localStorage.setItem(SESSION, value); } catch {} return s; } } catch {}
+  return null;
 }
