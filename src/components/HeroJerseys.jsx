@@ -4,7 +4,7 @@ const STEPS = ["Pick 15 players", "Choose C, VC & keeper", "Send your squad"];
 export default function HeroJerseys({ step, fans = 0 }) {
   return (<header className="max-w-[1400px] mx-auto px-4 pt-12 pb-8 text-center">
     <div className="flex justify-center items-end gap-3 mb-5">
-      {[18, 45, 93].map((n, i) => <motion.div key={n} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: i * .15 }}
+      {[18, 45, 7].map((n, i) => <motion.div key={n} initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: i * .15 }}
 className="relative text-[#0F52BA]"><Shirt size={i === 1 ? 84 : 60} strokeWidth={1.2} fill="currentColor" className="drop-shadow-[0_10px_30px_rgba(15,82,186,.6)]" />
         <span className="absolute inset-0 flex items-center justify-center font-oswald text-white text-lg pt-2">{n}</span></motion.div>)}
     </div>
