@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { UserCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { byId, count, RULES } from "./data/players";
 import BackgroundFX from "./components/BackgroundFX"; import HeroJerseys from "./components/HeroJerseys";
@@ -7,6 +8,9 @@ import PlayerGrid from "./components/PlayerGrid";
 import SquadLocker from "./components/SquadLocker";
 import SubmitModal from "./components/SubmitModal";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
+import AuthModal from "./components/AuthModal";
+import { getStats, serverReady } from "./utils/api";
+import { getSession, saveSession, clearSession, restoreSquads, loadCommunity, saveCommunity } from "./utils/storage";
 
 const MAX = {
   bat: 7,
@@ -39,7 +43,12 @@ export default function App() {
   });
 
   const [modal, setModal] = useState(false);
-  const [tick, setTick] = useState(0);
+  const [auth, setAuth] = useState(null);            // null | "login" | "create"
+  const [session, setSession] = useState(getSession);  // logged-in account (kept on the phone; the account itself is on the server)
+  const [community, setCommunity] = useState(loadCommunity);
+
+  const refreshStats = () => { if (serverReady()) getStats().then(l => { if (Array.isArray(l)) { setCommunity(l); saveCommunity(l); } }).catch(() => {}); };
+  useEffect(() => { refreshStats(); restoreSquads().then(s => { if (s) setSession(s); }); }, []);
 
   const notify = (msg, ok = false) => {
     setToast({ msg, ok });
@@ -52,6 +61,18 @@ export default function App() {
       setToast(null);
     }, 2800);
   };
+
+  const onLoggedIn = r => {
+    const acc = { token: r.token, name: r.name, email: r.email, phone: r.phone };
+    saveSession(acc); setSession(acc); setAuth(null);
+    // Bring back the squad this account saved earlier (only if nothing is picked yet on this phone).
+    if (r.squad && sel.length === 0) {
+      const ids = r.squad.selected.filter(id => byId[id]);
+      if (ids.length === 15) { setSel(ids); setRoles({ cap: r.squad.cap, vc: r.squad.vc, wk: r.squad.wk }); notify("Welcome back – your saved squad is loaded", true); }
+    }
+  };
+  const onLogout = () => { clearSession(); setSession(null); setAuth(null); };
+  const finalize = () => { if (!session) { setAuth("login"); notify("Please log in to send your squad", true); } else setModal(true); };
 
   const blockReason = (id) => {
     const group = groupOf(id);
@@ -156,8 +177,15 @@ export default function App() {
     <>
       <BackgroundFX />
 
+      <button onClick={() => setAuth("login")} aria-label={session ? "My account" : "Login or create account"}
+        className="fixed left-3 z-30 grid place-items-center w-11 h-11 rounded-full glass backdrop-blur text-white/90 active:scale-95 transition"
+        style={{ top: "calc(env(safe-area-inset-top) + 12px)" }}>
+        {session ? <span className="grid place-items-center w-8 h-8 rounded-full bg-[#FF9933] text-[#050d1f] font-oswald text-sm">{session.name.trim()[0]?.toUpperCase()}</span> : <UserCircle size={28} />}
+      </button>
+
       <HeroJerseys
         step={go ? 2 : ready ? 1 : 0}
+        fans={community.length}
       />
 
       <main className="max-w-[1400px] mx-auto px-3 sm:px-4 pb-20 overflow-x-clip">
@@ -186,7 +214,7 @@ export default function App() {
                 setRole={setRole}
                 problem={problem}
                 go={go}
-                onFinalize={() => setModal(true)}
+                onFinalize={finalize}
               />
 
             </div>
@@ -194,7 +222,7 @@ export default function App() {
         </div>
 
         {/* ANALYTICS */}
-        <AnalyticsDashboard tick={tick} />
+        <AnalyticsDashboard squads={community} />
       </main>
 
       {/* TOAST */}
@@ -225,14 +253,19 @@ export default function App() {
 
       {/* SUBMIT MODAL */}
       <AnimatePresence>
-        {modal && (
+        {auth && <AuthModal start={auth} session={session} onClose={() => setAuth(null)} onLoggedIn={onLoggedIn} onLogout={onLogout} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {modal && session && (
           <SubmitModal
+            account={session}
             selected={sel}
             cap={cap}
             vc={vc}
             wk={wk}
             onClose={() => setModal(false)}
-            onSaved={() => setTick((t) => t + 1)}
+            onSaved={(l) => { if (l.length) { setCommunity(l); saveCommunity(l); } else refreshStats(); }}
           />
         )}
       </AnimatePresence>
