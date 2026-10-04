@@ -5,8 +5,8 @@ import { createAccount, loginAccount, errorText } from "../utils/api";
 
 const digits = v => v.replace(/\D/g, "").slice(0, 10);
 const Popup = ({ kind, onClose, onCreate }) => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-10 bg-black/70 grid place-items-center p-6 rounded-3xl">
-    <motion.div initial={{ scale: .8, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} transition={{ type: "spring", damping: 16, stiffness: 220 }}
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .12 }} className="absolute inset-0 z-10 bg-black/70 grid place-items-center p-6 rounded-3xl">
+    <motion.div initial={{ scale: .92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: .15 }}
       className="bg-[#0a1630] border border-white/15 rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl">
       {kind === "ok" ? (<>
         <motion.svg width="72" height="72" viewBox="0 0 72 72" className="mx-auto mb-3">
@@ -15,7 +15,7 @@ const Popup = ({ kind, onClose, onCreate }) => (
         </motion.svg>
         <p className="font-oswald text-xl">Logged in successfully</p></>
       ) : (<>
-        <motion.div initial={{ rotate: -20, scale: .5 }} animate={{ rotate: 0, scale: 1 }} transition={{ type: "spring" }} className="mx-auto mb-3 w-14 h-14 rounded-full bg-amber-400/15 grid place-items-center text-3xl">!</motion.div>
+        <div className="mx-auto mb-3 w-14 h-14 rounded-full bg-amber-400/15 grid place-items-center text-3xl">!</div>
         <p className="font-oswald text-xl mb-1">Please create a new account</p>
         <p className="text-sm text-white/55 mb-4">We could not find an account with that name and phone number.</p>
         <div className="flex gap-2"><button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-white/10">Try again</button>
@@ -55,8 +55,8 @@ export default function AuthModal({ start, session, onClose, onLoggedIn, onLogou
   };
 
   const title = view === "account" ? "Your account" : view === "create" ? "Create account" : "Login";
-  return (<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={popup === "ok" ? undefined : onClose} className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4">
-    <motion.div initial={{ scale: .94, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: .94 }} onClick={e => e.stopPropagation()}
+  return (<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .15 }} onClick={popup === "ok" ? undefined : onClose} className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4">
+    <motion.div initial={{ scale: .97 }} animate={{ scale: 1 }} transition={{ duration: .15 }} onClick={e => e.stopPropagation()}
       className="relative bg-[#0a1630] border border-white/10 rounded-3xl w-full max-w-sm max-h-[90vh] overflow-y-auto scroll-thin shadow-2xl">
       <div className="tricolour h-1 rounded-t-3xl" />
       <div className="p-6 grid gap-5">
@@ -72,7 +72,7 @@ export default function AuthModal({ start, session, onClose, onLoggedIn, onLogou
 
         {view === "login" && <form onSubmit={login} className="grid gap-4">
           {created && <p className="text-sm text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/30 rounded-xl px-4 py-2.5">Account created. Please log in.</p>}
-          <input value={f.name} onChange={set("name")} placeholder="Name" autoComplete="name" className="field" />
+          <input value={f.name} onChange={set("name")} placeholder=" Enter Your First-Name" autoComplete="name" className="field" />
           <input type="tel" inputMode="numeric" maxLength={10} value={f.phone} onChange={set("phone")} placeholder="Phone number (10 digits)" autoComplete="tel" className="field" />
           {error && <p role="alert" className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2.5">{error}</p>}
           <button disabled={busy} className="py-3 rounded-xl bg-[#0F52BA] hover:bg-[#1660d6] font-semibold disabled:opacity-50">{busy ? "Logging in…" : "Login"}</button>
@@ -90,4 +90,4 @@ export default function AuthModal({ start, session, onClose, onLoggedIn, onLogou
       </div>
       <AnimatePresence>{popup && <Popup kind={popup} onClose={() => setPopup(null)} onCreate={() => { setPopup(null); go("create"); }} />}</AnimatePresence>
     </motion.div></motion.div>);
-}
+          }
