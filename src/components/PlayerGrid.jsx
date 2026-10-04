@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Plus, Search } from "lucide-react";
 import { PLAYERS, ROLE_LABEL, ROLE_COLOR, initials } from "../data/players";
 const FILTERS = ["all", "bat", "wk", "ar", "fast", "spin"];
 const stats = p => [p.avg != null && `Avg ${p.avg}`, p.sr != null && `SR ${p.sr}`, p.bavg != null && `Bowl avg ${p.bavg}`, p.econ != null && `Econ ${p.econ}`].filter(Boolean).join(" · ");
 export default function PlayerGrid({ selected, onPick, blockReason }) {
-  const [f, setF] = useState("all"), [q, setQ] = useState("");
+  const [f, setF] = useState("all"), [q, setQ] = useState(""), box = useRef(null);
+  useEffect(() => { box.current?.scrollTo({ top: 0 }); }, [f, q]);   // new filter / search: start the list from the top
   const list = PLAYERS.filter(p => (f === "all" || p.role === f) && p.name.toLowerCase().includes(q.trim().toLowerCase()));
   const picked = k => selected.filter(id => k === "all" || PLAYERS.find(p => p.id === id).role === k).length;
   return (<section className="flex-1 min-w-0">
@@ -24,7 +25,9 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
       </div>
     </div>
     {!list.length && <p className="text-white/50 text-sm py-10 text-center">No players match “{q}”.</p>}
-    <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-3">
+    {/* Only about 5 players are visible; the list scrolls up/down inside this box (never sideways), so the page itself stays short. */}
+    <div ref={box} className="max-h-[600px] min-[420px]:max-h-[400px] md:max-h-[340px] overflow-y-auto overflow-x-hidden scroll-thin pr-1.5 -mr-1.5 rounded-2xl">
+    <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-3 pb-1">
       {list.map((p, i) => { const on = selected.includes(p.id), blocked = !on && blockReason(p.id), color = ROLE_COLOR[p.role];
         return <motion.button key={p.id} style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }} whileTap={{ scale: .96 }} onClick={() => onPick(p.id)} aria-pressed={on} title={blocked || undefined}
           className={`card-in group relative overflow-hidden rounded-2xl p-4 text-left border transition-colors ${on ? "bg-[#FF9933]/[.12] border-[#FF9933]" : "glass hover:border-white/25"} ${blocked ? "opacity-45" : ""}`}>
@@ -44,5 +47,6 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
           {blocked && <p className="text-[11px] text-amber-300/90 mt-2">{blocked}</p>}
         </motion.button>; })}
     </div>
+    </div>
   </section>);
-}
+          }
