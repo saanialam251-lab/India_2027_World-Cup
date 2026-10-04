@@ -14,7 +14,7 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
         <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" />
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search players" className="field pl-10 py-2.5" />
       </label>
-      <div className="flex gap-1 p-1 rounded-2xl bg-white/[.04] border border-white/10 overflow-x-auto scroll-thin">
+      <div className="flex gap-1 p-1 rounded-2xl bg-white/[.04] border border-white/10 overflow-x-auto scroll-thin min-w-0 max-w-full">
         {FILTERS.map(k => <button key={k} onClick={() => setF(k)}
           className={`shrink-0 px-3.5 py-1.5 rounded-xl text-sm flex items-center gap-1.5 transition ${f === k ? "bg-white text-[#050d1f] font-semibold" : "text-white/70 hover:text-white hover:bg-white/10"}`}>
           {k !== "all" && <span className="w-2 h-2 rounded-full" style={{ background: ROLE_COLOR[k] }} />}
@@ -25,9 +25,9 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
     </div>
     {!list.length && <p className="text-white/50 text-sm py-10 text-center">No players match “{q}”.</p>}
     <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-3">
-      {list.map(p => { const on = selected.includes(p.id), blocked = !on && blockReason(p.id), color = ROLE_COLOR[p.role];
-        return <motion.button layout key={p.id} whileHover={{ y: -3 }} whileTap={{ scale: .97 }} onClick={() => onPick(p.id)} aria-pressed={on} title={blocked || undefined}
-          className={`group relative overflow-hidden rounded-2xl p-4 text-left border transition-colors ${on ? "bg-[#FF9933]/[.12] border-[#FF9933]" : "glass hover:border-white/25"} ${blocked ? "opacity-45" : ""}`}>
+      {list.map((p, i) => { const on = selected.includes(p.id), blocked = !on && blockReason(p.id), color = ROLE_COLOR[p.role];
+        return <motion.button key={p.id} style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }} whileTap={{ scale: .96 }} onClick={() => onPick(p.id)} aria-pressed={on} title={blocked || undefined}
+          className={`card-in group relative overflow-hidden rounded-2xl p-4 text-left border transition-colors ${on ? "bg-[#FF9933]/[.12] border-[#FF9933]" : "glass hover:border-white/25"} ${blocked ? "opacity-45" : ""}`}>
           <span className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
           <div className="flex items-center gap-3">
             <span className="grid place-items-center shrink-0 w-11 h-11 rounded-full font-oswald text-lg" style={{ background: `${color}26`, color, boxShadow: `inset 0 0 0 1.5px ${color}66` }}>{initials(p.name)}</span>
