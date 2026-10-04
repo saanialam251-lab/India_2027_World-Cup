@@ -8,10 +8,8 @@ body {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
 .field {
@@ -25,3 +23,17 @@ body {
 :focus-visible { outline: 2px solid #FF9933; outline-offset: 2px; }
 
 .scroll-thin { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
+/* Android app: keep content below the status bar and above the gesture bar */
+body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+
+/* No sideways scrolling, vertical scroll only */
+html, body { max-width: 100%; overflow-x: clip; overscroll-behavior-x: none; }
+body { touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+img, canvas, svg { max-width: 100%; }
+/* Cheap animations: transform + opacity only */
+.rise, .card-in { animation: rise .5s cubic-bezier(.22,1,.36,1) both; }
+.card-in { animation-duration: .4s; }
+.grow { transform-origin: left; animation: grow .9s cubic-bezier(.22,1,.36,1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes grow { from { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
