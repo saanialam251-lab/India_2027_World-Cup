@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Check, Copy, Mail } from "lucide-react";
 import { byId, ROLE_COLOR } from "../data/players";
-import { sendSquad, gmailUrl, BCCI_EMAIL } from "../utils/emailService";
+import { buildEmail, mailtoUrl, gmailUrl, BCCI_EMAIL } from "../utils/emailService";
 import { saveSquad } from "../utils/storage";
 
 export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved }) {
@@ -20,30 +20,28 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
     setBusy(true);
     const squad = { selected, cap, vc, wk, fanName: name, fanEmail: email, fanPhone: phone };
     saveSquad(squad); onSaved?.();            // saved first, so the email includes your own squad in the totals
-    setRes(await sendSquad(squad)); setBusy(false);
+    setRes({ mail: buildEmail(squad) }); setBusy(false);
   };
   const copy = async () => { try { await navigator.clipboard.writeText(`To: ${res.mail.to}\nSubject: ${res.mail.subject}\n\n${res.mail.body}`); setCopied(true); } catch {} };
 
-  return (<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+  return (<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4">
     <motion.div initial={{ scale: .94, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: .94 }} onClick={e => e.stopPropagation()}
       className="relative bg-[#0a1630] border border-white/10 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scroll-thin shadow-2xl">
       <div className="tricolour h-1 rounded-t-3xl" />
       <div className="p-6 grid gap-5">
         <div className="flex items-start justify-between gap-4">
-          <div><h2 className="font-oswald text-2xl">{res ? "Your email is ready" : "Send your squad to BCCI"}</h2>
+          <div><h2 className="font-oswald text-2xl">{res ? "Choose how to send" : "Send your squad to BCCI"}</h2>
             <p className="text-sm text-white/55 mt-1">{res ? `Addressed to ${BCCI_EMAIL}` : "Review your 15 and add your details."}</p></div>
           <button type="button" onClick={onClose} aria-label="Close" className="grid place-items-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20"><X size={16} /></button>
         </div>
 
         {res ? (<div className="grid gap-3 text-sm">
-          <p className="flex gap-2 items-start text-white/80"><Check size={18} className="text-[#22c55e] shrink-0 mt-0.5" />
-            {res.via === "app" ? "Your email app opened with the message written. Press Send there." : res.via === "gmail" ? "No email app on this device, so Gmail opened in a new tab. Press Send there." : "Your browser blocked the Gmail tab. Use a button below."}</p>
-          <p className="text-white/50">Nothing is sent until you press Send in your email.</p>
-          <div className="flex flex-wrap gap-2">
-            <a href={gmailUrl(res.mail)} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F52BA] hover:bg-[#1660d6] font-semibold"><Mail size={16} />Open in Gmail</a>
-            <button onClick={copy} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15"><Copy size={16} />{copied ? "Copied" : "Copy email"}</button>
-            <button onClick={onClose} className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 ml-auto">Done</button>
-          </div></div>
+          <p className="flex gap-2 items-start text-white/80"><Check size={18} className="text-[#22c55e] shrink-0 mt-0.5" />Your squad is saved. The email is written. Pick one way to send it:</p>
+          <a href={mailtoUrl(res.mail)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-[#0F52BA] active:scale-[.98] font-semibold"><Mail size={18} />Open in my email app</a>
+          <a href={gmailUrl(res.mail)} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-white/10 active:scale-[.98] font-semibold"><Mail size={18} />Open Gmail in the browser</a>
+          <button onClick={copy} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 text-white/80"><Copy size={16} />{copied ? "Copied" : "Copy the email text"}</button>
+          <p className="text-white/45 text-xs">Nothing is sent until you press Send in your email.</p>
+          <button onClick={onClose} className="px-4 py-2.5 rounded-xl bg-white/10 justify-self-end">Done</button></div>
         ) : (<form onSubmit={submit} className="grid gap-5">
           <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-sm bg-white/[.04] rounded-2xl p-4">
             {selected.map((id, i) => <li key={id} className="flex items-center gap-2 min-w-0">
