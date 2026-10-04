@@ -173,8 +173,8 @@ export default function App() {
           </div>
 
           {/* RIGHT PANEL */}
-          <div className="lg:w-[400px] shrink-0 self-start lg:sticky lg:top-5 w-full">
-            <div className="grid gap-4">
+          <div className="lg:w-[400px] shrink-0 self-start lg:sticky lg:top-5 w-full min-w-0">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
 
               <SquadLocker
                 selected={sel}
@@ -238,4 +238,4 @@ export default function App() {
       </AnimatePresence>
     </>
   );
-            }
+    }
