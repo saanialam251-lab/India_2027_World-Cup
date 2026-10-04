@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { X, Check, Copy, Mail } from "lucide-react";
 import { byId, ROLE_COLOR } from "../data/players";
 import { buildEmail, mailtoUrl, gmailUrl, BCCI_EMAIL } from "../utils/emailService";
-import { saveSquad } from "../utils/storage";
+import { submitSquad, getStats, errorText } from "../utils/api";
 
-export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved }) {
-  const [f, setF] = useState({ name: "", email: "", phone: "" });
+export default function SubmitModal({ selected, cap, vc, wk, account, onClose, onSaved }) {
+  const [f, setF] = useState({ name: account.name, email: account.email, phone: account.phone });
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [res, setRes] = useState(null), [copied, setCopied] = useState(false);
   const set = k => e => setF({ ...f, [k]: e.target.value });
   const tag = id => id === cap ? "C" : id === vc ? "VC" : id === wk ? "WK" : "";
@@ -19,8 +19,14 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
     if (phone.length !== 10) return setError("Please enter a valid 10-digit phone number.");
     setBusy(true);
     const squad = { selected, cap, vc, wk, fanName: name, fanEmail: email, fanPhone: phone };
-    saveSquad(squad); onSaved?.();            // saved first, so the email includes your own squad in the totals
-    setRes({ mail: buildEmail(squad) }); setBusy(false);
+    try {
+      const r = await submitSquad(account.token, squad);
+      if (!r.ok) { setBusy(false); return setError(r.reason === "not_logged_in" ? "Please log in again." : "Could not save your squad. Please check it and try again."); }
+      let all = []; try { all = await getStats(); } catch {}   // your own squad is already in the totals
+      onSaved?.(all);
+      setRes({ mail: buildEmail(squad, all) });
+    } catch (er) { setError(errorText(er)); }
+    setBusy(false);
   };
   const copy = async () => { try { await navigator.clipboard.writeText(`To: ${res.mail.to}\nSubject: ${res.mail.subject}\n\n${res.mail.body}`); setCopied(true); } catch {} };
 
@@ -36,7 +42,7 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
         </div>
 
         {res ? (<div className="grid gap-3 text-sm">
-          <p className="flex gap-2 items-start text-white/80"><Check size={18} className="text-[#22c55e] shrink-0 mt-0.5" />Your squad is saved. The email is written. Pick one way to send it:</p>
+          <p className="flex gap-2 items-start text-white/80"><Check size={18} className="text-[#22c55e] shrink-0 mt-0.5" />Your squad is saved on the server. The email is written. Pick one way to send it:</p>
           <a href={mailtoUrl(res.mail)} className="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-[#0F52BA] active:scale-[.98] font-semibold"><Mail size={18} />Open in my email app</a>
           <a href={gmailUrl(res.mail)} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-white/10 active:scale-[.98] font-semibold"><Mail size={18} />Open Gmail in the browser</a>
           <button onClick={copy} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 text-white/80"><Copy size={16} />{copied ? "Copied" : "Copy the email text"}</button>
@@ -54,7 +60,7 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
           <div className="grid gap-3">
             <input value={f.name} onChange={set("name")} placeholder="Your name" autoComplete="name" className="field" />
             <input type="email" value={f.email} onChange={set("email")} placeholder="Your email" autoComplete="email" className="field" />
-            <input type="tel" inputMode="numeric" maxLength={10} pattern="[0-9]{10}" value={f.phone} onChange={e => setF({ ...f, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} placeholder="10-digit phone number" autoComplete="tel" className="field" />
+            <input type="tel" readOnly value={f.phone} aria-label="Phone number (from your account)" autoComplete="tel" className="field" />
           </div>
           {error && <p role="alert" className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2.5">{error}</p>}
           <div className="flex gap-3 justify-end">
@@ -64,4 +70,4 @@ export default function SubmitModal({ selected, cap, vc, wk, onClose, onSaved })
         </form>)}
       </div>
     </motion.div></motion.div>);
-}
+    }
