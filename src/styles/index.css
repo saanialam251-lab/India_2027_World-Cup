@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply font-poppins text-white min-h-screen antialiased;
+  background: #050d1f;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.field {
+  @apply w-full bg-white/[.06] border border-white/10 rounded-xl px-4 py-3 text-sm placeholder:text-white/40 outline-none transition focus:border-[#FF9933]/70 focus:bg-white/10;
+}
+
+.tricolour {
+  background: linear-gradient(90deg, #FF9933 0 33.3%, #ffffff 33.3% 66.6%, #138808 66.6%);
+}
+
+:focus-visible { outline: 2px solid #FF9933; outline-offset: 2px; }
+
+.scroll-thin { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
