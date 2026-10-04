@@ -160,7 +160,7 @@ export default function App() {
         step={go ? 2 : ready ? 1 : 0}
       />
 
-      <main className="max-w-[1400px] mx-auto px-4 pb-20">
+      <main className="max-w-[1400px] mx-auto px-3 sm:px-4 pb-20 overflow-x-clip">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
           {/* PLAYER GRID */}
@@ -238,4 +238,4 @@ export default function App() {
       </AnimatePresence>
     </>
   );
-}
+            }
