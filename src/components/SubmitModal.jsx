@@ -3,8 +3,10 @@ import { X, Check, Copy, Mail } from "lucide-react";
 import { byId, ROLE_COLOR } from "../data/players";
 import { buildEmail, mailtoUrl, gmailUrl, BCCI_EMAIL } from "../utils/emailService";
 import { submitSquad, getStats, errorText } from "../utils/api";
+import { useScrollLock } from "../utils/hooks";
 
 export default function SubmitModal({ selected, cap, vc, wk, account, onClose, onSaved, onDone }) {
+  useScrollLock();
   const [f, setF] = useState({ name: account.name, email: account.email, phone: account.phone });
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [res, setRes] = useState(null), [copied, setCopied] = useState(false);
   const set = k => e => setF({ ...f, [k]: e.target.value });
@@ -72,4 +74,4 @@ export default function SubmitModal({ selected, cap, vc, wk, account, onClose, o
         </form>)}
       </div>
     </div></div>);
-              }
+        }
