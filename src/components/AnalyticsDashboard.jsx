@@ -30,8 +30,8 @@ const Tile = ({ id, rank, pct, d = 0 }) => { const p = byId[id], c = ROLE_COLOR[
         <span className="font-oswald text-2xl leading-none">{rank}</span><span className="text-[9px] font-semibold mt-1 leading-tight uppercase">{p.name.split(" ").pop()}</span></div></div>
     <p className="text-center text-xs font-semibold mt-1" style={{ color: c }}>{pct}%</p></div>); };
 
-export default function AnalyticsDashboard({ squads = [] }) {
-  const n = squads.length, [rootRef, seen] = useReveal(squads.length);
+export default function AnalyticsDashboard({ squads = [], total }) {
+  const n = squads.length, sent = total || n, [rootRef, seen] = useReveal(squads.length);
   if (!n) return (<section ref={rootRef} className="glass rounded-3xl p-8 mt-10 text-center"><h2 className="font-oswald text-2xl">Fan Analytics</h2>
     <p className="text-white/55 text-sm mt-2">No fan has submitted a squad yet. Be the first and the charts will appear here.</p></section>);
 
@@ -43,10 +43,10 @@ export default function AnalyticsDashboard({ squads = [] }) {
 
   return (<section ref={rootRef} className={`glass rounded-3xl p-4 sm:p-6 md:p-8 mt-10 overflow-hidden ${seen ? "revealed" : ""}`}>
     <div className="flex flex-wrap items-end justify-between gap-2 mb-6"><div><h2 className="font-oswald text-3xl">Fan Analytics</h2>
-      <p className="text-sm text-white/55">Live from {n} fan{n > 1 ? "s" : ""} who submitted a squad</p></div><div className="tricolour h-1 w-24 rounded-full" /></div>
+      <p className="text-sm text-white/55">Live from {sent} squad{sent > 1 ? "s" : ""} sent by {n} fan{n > 1 ? "s" : ""}</p></div><div className="tricolour h-1 w-24 rounded-full" /></div>
 
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-      <Stat d={0.00} icon={Users} label="Fans submitted" value={n} sub={`${picks.length} different players picked`} />
+      <Stat d={0.00} icon={Users} label="Squads submitted" value={sent} sub={`${n} fan${n > 1 ? "s" : ""} · ${picks.length} players picked`} />
       <Stat d={0.08} icon={Crown} label="Top captain" value={byId[caps[0][0]].name.split(" ").pop()} sub={`${pct(caps[0][1])}% of fans`} />
       <Stat d={0.16} icon={Shield} label="Top vice-captain" value={byId[vcs[0][0]].name.split(" ").pop()} sub={`${pct(vcs[0][1])}% of fans`} />
       <Stat d={0.24} icon={Trophy} label="Top keeper" value={byId[wks[0][0]].name.split(" ").pop()} sub={`${pct(wks[0][1])}% of fans`} />
@@ -71,4 +71,4 @@ export default function AnalyticsDashboard({ squads = [] }) {
           <div className="flex flex-wrap gap-1 justify-center">{ids.map((id, i) => <Tile key={id} id={id} rank={i + 1} pct={pct(picks.find(([k]) => k === id)[1])} d={i * 0.06} />)}</div></div>))}
     </div>
   </section>);
-    }
+      }
