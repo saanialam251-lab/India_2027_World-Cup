@@ -86,7 +86,7 @@ export default function AuthModal({ start, session, onClose, onLoggedIn, onLogou
 
         {view === "login" && <form onSubmit={login} className="grid gap-4">
           {created && <p className="text-sm text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/30 rounded-xl px-4 py-2.5">Account created. Please log in.</p>}
-          <input value={f.name} onChange={set("name")} placeholder=" Enter Your First Name" autoComplete="name" className="field" />
+          <input value={f.name} onChange={set("name")} placeholder="Enter Your First Name" autoComplete="name" className="field" />
           <input type="tel" inputMode="numeric" maxLength={10} value={f.phone} onChange={set("phone")} placeholder="Phone number (10 digits)" autoComplete="tel" className="field" />
           {error && <p role="alert" className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2.5">{error}</p>}
           <button disabled={busy} className="py-3 rounded-xl bg-[#0F52BA] hover:bg-[#1660d6] font-semibold disabled:opacity-50">{busy ? "Logging in…" : "Login"}</button>
@@ -105,4 +105,4 @@ export default function AuthModal({ start, session, onClose, onLoggedIn, onLogou
     </div></div>
     {popup && <Popup kind={popup} name={f.name} onClose={() => setPopup(null)} onCreate={() => { setPopup(null); go("create"); }} />}
   </>);
-         }
+                    }
