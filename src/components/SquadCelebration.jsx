@@ -1,10 +1,12 @@
 import { useEffect } from "react";
+import { useScrollLock } from "../utils/hooks";
 import { byId, ROLE_COLOR, ROLE_LABEL, initials } from "../data/players";
 const ORDER = ["bat", "wk", "ar", "fast", "spin"];
 const CLIP = "polygon(30% 0,38% 6%,62% 6%,70% 0,100% 18%,88% 38%,76% 30%,76% 100%,24% 100%,24% 30%,12% 38%,0 18%)";
 
 // Shown after "Done": the fan's own 15, each jersey entering with a different animation (CSS only, so it stays smooth).
 export default function SquadCelebration({ squad, fans, onClose }) {
+  useScrollLock();
   useEffect(() => { const t = setTimeout(onClose, 15000); return () => clearTimeout(t); }, []);
   const ids = [...squad.selected].filter(id => byId[id]).sort((a, b) => ORDER.indexOf(byId[a].role) - ORDER.indexOf(byId[b].role));
   const tag = id => id === squad.cap ? "C" : id === squad.vc ? "VC" : id === squad.wk ? "WK" : "";
@@ -24,7 +26,7 @@ export default function SquadCelebration({ squad, fans, onClose }) {
             <p className="text-[10px] truncate" style={{ color: c }}>{ROLE_LABEL[p.role]}</p>
           </div>); })}
       </div>
-      <p className="mt-8 text-sm text-white/70 cj cj5" style={{ animationDelay: "1.5s" }}>🏏 <b>{fans}</b> fan{fans === 1 ? " has" : "s have"} submitted a squad so far</p>
+      <p className="mt-8 text-sm text-white/70 cj cj5" style={{ animationDelay: "1.5s" }}>🏏 <b>{fans}</b> fan{fans === 1 ? " has" : "s have"} submitted a squad so far. Each fan counts once, so sending again updates your squad.</p>
       <button onClick={onClose} className="cj cj5 mt-5 px-8 py-3 rounded-xl bg-[#0F52BA] font-semibold" style={{ animationDelay: "1.6s" }}>Back to home</button>
     </div></div>);
 }
