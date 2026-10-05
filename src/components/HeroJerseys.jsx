@@ -11,7 +11,7 @@ className="relative text-[#0F52BA]"><Shirt size={i === 1 ? 84 : 60} strokeWidth=
     <motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="font-oswald text-5xl md:text-7xl tracking-wide">INDIA 2027</motion.h1>
     <div className="tricolour h-1 w-24 mx-auto rounded-full mt-3" />
     <p className="mt-3 text-white/70 md:text-lg">The Blue Army Squad Lab – pick your 15 for the World Cup</p>
-    {fans > 0 && <p key={fans} className="bump mt-4 inline-block rounded-full border border-[#22c55e]/40 bg-[#22c55e]/10 text-xs sm:text-sm px-3.5 py-1">🏏 <b>{fans}</b> fan{fans > 1 ? "s have" : " has"} submitted a squad</p>}
+    {fans > 0 && <p key={fans} className="bump mt-4 inline-block rounded-full border border-[#22c55e]/40 bg-[#22c55e]/10 text-xs sm:text-sm px-3.5 py-1">🏏 <b>{fans}</b> squad{fans > 1 ? "s" : ""} submitted by fans</p>}
     <br />
     <ol className="mt-4 inline-flex flex-wrap justify-center gap-2 text-xs sm:text-sm">
       {STEPS.map((s, i) => { const state = i < step ? "done" : i === step ? "now" : "next";
