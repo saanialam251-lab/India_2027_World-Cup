@@ -9,6 +9,7 @@ import SquadLocker from "./components/SquadLocker";
 import SubmitModal from "./components/SubmitModal";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import AuthModal from "./components/AuthModal";
+import SquadCelebration from "./components/SquadCelebration";
 import { getStats, serverReady } from "./utils/api";
 import { getSession, saveSession, clearSession, restoreSquads, loadCommunity, saveCommunity } from "./utils/storage";
 
@@ -49,6 +50,7 @@ export default function App() {
   const [auth, setAuth] = useState(null);            // null | "login" | "create"
   const [session, setSession] = useState(getSession);  // logged-in account (kept on the phone; the account itself is on the server)
   const [community, setCommunity] = useState(loadCommunity);
+  const [celebrate, setCelebrate] = useState(null);     // the squad just sent, shown after "Done"
 
   const refreshStats = () => { if (serverReady()) getStats().then(l => { if (Array.isArray(l)) { setCommunity(l); saveCommunity(l); } }).catch(() => {}); };
   useEffect(() => { refreshStats(); restoreSquads().then(s => { if (s) setSession(s); }); }, []);
@@ -73,6 +75,11 @@ export default function App() {
       const ids = r.squad.selected.filter(id => byId[id]);
       if (ids.length === 15) { setSel(ids); setRoles({ cap: r.squad.cap, vc: r.squad.vc, wk: r.squad.wk }); notify("Welcome back – your saved squad is loaded", true); }
     }
+  };
+  // "Done" after sending: show the fan's 15, clear the picks so the screen starts fresh, refresh the fan count.
+  const onDone = (squad) => {
+    setModal(false); setCelebrate(squad); setSel([]); setRoles({ cap: "", vc: "", wk: "" });
+    refreshStats();
   };
   const onLogout = () => { clearSession(); setSession(null); setAuth(null); };
   const finalize = () => { if (!session) { setAuth("login"); notify("Please log in to send your squad", true); } else setModal(true); };
@@ -256,24 +263,21 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* SUBMIT MODAL */}
-      <AnimatePresence>
-        {auth && <AuthModal start={auth} session={session} onClose={() => setAuth(null)} onLoggedIn={onLoggedIn} onLogout={onLogout} />}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {modal && session && (
-          <SubmitModal
-            account={session}
-            selected={sel}
-            cap={cap}
-            vc={vc}
-            wk={wk}
-            onClose={() => setModal(false)}
-            onSaved={(l) => { if (l.length) { setCommunity(l); saveCommunity(l); } else refreshStats(); }}
-          />
-        )}
-      </AnimatePresence>
+      {/* LOGIN / ACCOUNT, SUBMIT AND "YOUR 15" SCREENS: plain conditional render (no exit animation) so they open and close instantly */}
+      {auth && <AuthModal start={auth} session={session} onClose={() => setAuth(null)} onLoggedIn={onLoggedIn} onLogout={onLogout} />}
+      {modal && session && (
+        <SubmitModal
+          account={session}
+          selected={sel}
+          cap={cap}
+          vc={vc}
+          wk={wk}
+          onClose={() => setModal(false)}
+          onDone={onDone}
+          onSaved={(l) => { if (l.length) { setCommunity(l); saveCommunity(l); } else refreshStats(); }}
+        />
+      )}
+      {celebrate && <SquadCelebration squad={celebrate} fans={community.length} onClose={() => { setCelebrate(null); window.scrollTo(0, 0); }} />}
     </>
   );
-        }
+      }
