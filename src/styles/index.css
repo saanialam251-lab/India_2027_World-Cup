@@ -37,3 +37,28 @@ img, canvas, svg { max-width: 100%; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes grow { from { transform: scaleX(0); } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* Pop-ups: CSS-only (no JavaScript animation, no exit animation) so they open and close instantly */
+.fade-in { animation: fadeIn .12s ease-out both; }
+.pop-in { animation: popIn .16s ease-out both; }
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes popIn { from { opacity: 0; transform: scale(.96); } }
+.draw { stroke-dasharray: 200; stroke-dashoffset: 200; animation: draw .45s ease-out forwards; }
+.draw2 { animation-delay: .3s; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.bump { animation: bump .6s cubic-bezier(.22,1,.36,1); }
+@keyframes bump { 0% { transform: scale(1); } 35% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+/* "Your 15" celebration: six different entrances, transform + opacity only */
+.celeb-grid { perspective: 700px; }
+.cj { animation-duration: .6s; animation-timing-function: cubic-bezier(.22,1,.36,1); animation-fill-mode: both; }
+.cj0 { animation-name: cjPop; } .cj1 { animation-name: cjLeft; } .cj2 { animation-name: cjRight; }
+.cj3 { animation-name: cjDrop; } .cj4 { animation-name: cjFlip; } .cj5 { animation-name: cjRise; }
+@keyframes cjPop { from { opacity: 0; transform: scale(.2); } }
+@keyframes cjLeft { from { opacity: 0; transform: translateX(-70px); } }
+@keyframes cjRight { from { opacity: 0; transform: translateX(70px); } }
+@keyframes cjDrop { from { opacity: 0; transform: translateY(-70px) rotate(-10deg); } }
+@keyframes cjFlip { from { opacity: 0; transform: rotateY(90deg); } }
+@keyframes cjRise { from { opacity: 0; transform: translateY(70px); } }
+.glow { animation: glow 1.6s ease-in-out infinite alternate; }
+@keyframes glow { from { opacity: .55; } to { opacity: 1; } }
