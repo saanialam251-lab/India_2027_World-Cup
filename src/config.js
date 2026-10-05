@@ -3,4 +3,4 @@
 // URL: Supabase > Project Settings > API > "Project URL"  (looks like https://abcdxyz.supabase.co  – nothing after .co)
 // KEY: Supabase > Project Settings > API > "Publishable key" (starts with sb_publishable_)  – never the secret key
 export const SUPABASE_URL = "https://ydbouhspcjizvfuqbang.supabase.co";
-export const SUPABASE_ANON_KEY = "sb_publishable_nzIjV4qgjyDmilpqo5s2kA_TFG5H1a8";
+export const SUPABASE_ANON_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";

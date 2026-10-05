@@ -1,0 +1,9 @@
+node_modules
+dist
+.netlify
+android
+dist
+node_modules
+desktop/node_modules
+desktop/app
+desktop/release
