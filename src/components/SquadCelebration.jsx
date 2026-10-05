@@ -26,7 +26,7 @@ export default function SquadCelebration({ squad, fans, onClose }) {
             <p className="text-[10px] truncate" style={{ color: c }}>{ROLE_LABEL[p.role]}</p>
           </div>); })}
       </div>
-      <p className="mt-8 text-sm text-white/70 cj cj5" style={{ animationDelay: "1.5s" }}>🏏 <b>{fans}</b> fan{fans === 1 ? " has" : "s have"} submitted a squad so far. Each fan counts once, so sending again updates your squad.</p>
+      <p className="mt-8 text-sm text-white/70 cj cj5" style={{ animationDelay: "1.5s" }}>🏏 <b>{fans}</b> squad{fans === 1 ? "" : "s"} submitted by fans so far. Yours is counted!</p>
       <button onClick={onClose} className="cj cj5 mt-5 px-8 py-3 rounded-xl bg-[#0F52BA] font-semibold" style={{ animationDelay: "1.6s" }}>Back to home</button>
     </div></div>);
 }
