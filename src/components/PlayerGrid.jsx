@@ -30,7 +30,7 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
     <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-3 pb-1">
       {list.map((p, i) => { const on = selected.includes(p.id), blocked = !on && blockReason(p.id), color = ROLE_COLOR[p.role];
         return <motion.button key={p.id} style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }} whileTap={{ scale: .96 }} onClick={() => onPick(p.id)} aria-pressed={on} title={blocked || undefined}
-          className={`card-in group relative overflow-hidden rounded-2xl p-4 text-left border transition-colors ${on ? "bg-[#FF9933]/[.12] border-[#FF9933]" : "glass hover:border-white/25"} ${blocked ? "opacity-45" : ""}`}>
+          className={`card-in cj cj${i % 6} ${on ? "sel-bounce" : ""} group relative overflow-hidden rounded-2xl p-4 text-left border transition-colors ${on ? "bg-[#FF9933]/[.12] border-[#FF9933]" : "glass hover:border-white/25"} ${blocked ? "opacity-45" : ""}`}>
           <span className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
           <div className="flex items-center gap-3">
             <span className="grid place-items-center shrink-0 w-11 h-11 rounded-full font-oswald text-lg" style={{ background: `${color}26`, color, boxShadow: `inset 0 0 0 1.5px ${color}66` }}>{initials(p.name)}</span>
@@ -38,7 +38,7 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
               <p className="font-semibold leading-tight truncate">{p.name}</p>
               <p className="text-xs mt-0.5" style={{ color }}>{ROLE_LABEL[p.role]}</p>
             </div>
-            <span className={`grid place-items-center shrink-0 w-7 h-7 rounded-full transition ${on ? "bg-[#FF9933] text-[#050d1f]" : "bg-white/10 text-white/60 group-hover:bg-white/20 group-hover:text-white"}`}>
+            <span key={on ? "on" : "off"} className={`grid place-items-center shrink-0 w-7 h-7 rounded-full transition ${on ? "cj cj0 " : ""}${on ? "bg-[#FF9933] text-[#050d1f]" : "bg-white/10 text-white/60 group-hover:bg-white/20 group-hover:text-white"}`}>
               {on ? <Check size={16} strokeWidth={3} /> : <Plus size={16} />}
             </span>
           </div>
@@ -49,4 +49,4 @@ export default function PlayerGrid({ selected, onPick, blockReason }) {
     </div>
     </div>
   </section>);
-          }
+}
