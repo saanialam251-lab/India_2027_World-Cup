@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { X, Check, Copy, Mail } from "lucide-react";
 import { byId, ROLE_COLOR } from "../data/players";
 import { buildEmail, mailtoUrl, gmailUrl, BCCI_EMAIL } from "../utils/emailService";
 import { submitSquad, getStats, errorText } from "../utils/api";
 
-export default function SubmitModal({ selected, cap, vc, wk, account, onClose, onSaved }) {
+export default function SubmitModal({ selected, cap, vc, wk, account, onClose, onSaved, onDone }) {
   const [f, setF] = useState({ name: account.name, email: account.email, phone: account.phone });
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [res, setRes] = useState(null), [copied, setCopied] = useState(false);
   const set = k => e => setF({ ...f, [k]: e.target.value });
@@ -28,17 +27,20 @@ export default function SubmitModal({ selected, cap, vc, wk, account, onClose, o
     } catch (er) { setError(errorText(er)); }
     setBusy(false);
   };
+  // Once the squad is saved, closing in any way counts as "Done": the app shows your 15 and starts fresh.
+  const finish = () => onDone({ selected, cap, vc, wk });
+  const close = res ? finish : onClose;
   const copy = async () => { try { await navigator.clipboard.writeText(`To: ${res.mail.to}\nSubject: ${res.mail.subject}\n\n${res.mail.body}`); setCopied(true); } catch {} };
 
-  return (<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4">
-    <motion.div initial={{ scale: .94, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: .94 }} onClick={e => e.stopPropagation()}
-      className="relative bg-[#0a1630] border border-white/10 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scroll-thin shadow-2xl">
+  return (<div onClick={close} className="fade-in fixed inset-0 bg-[#050d1f]/90 z-40 flex items-center justify-center p-4">
+    <div onClick={e => e.stopPropagation()}
+      className="pop-in relative bg-[#0a1630] border border-white/10 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scroll-thin shadow-2xl">
       <div className="tricolour h-1 rounded-t-3xl" />
       <div className="p-6 grid gap-5">
         <div className="flex items-start justify-between gap-4">
           <div><h2 className="font-oswald text-2xl">{res ? "Choose how to send" : "Send your squad to BCCI"}</h2>
             <p className="text-sm text-white/55 mt-1">{res ? `Addressed to ${BCCI_EMAIL}` : "Review your 15 and add your details."}</p></div>
-          <button type="button" onClick={onClose} aria-label="Close" className="grid place-items-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20"><X size={16} /></button>
+          <button type="button" onClick={close} aria-label="Close" className="grid place-items-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20"><X size={16} /></button>
         </div>
 
         {res ? (<div className="grid gap-3 text-sm">
@@ -47,7 +49,7 @@ export default function SubmitModal({ selected, cap, vc, wk, account, onClose, o
           <a href={gmailUrl(res.mail)} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-white/10 active:scale-[.98] font-semibold"><Mail size={18} />Open Gmail in the browser</a>
           <button onClick={copy} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 text-white/80"><Copy size={16} />{copied ? "Copied" : "Copy the email text"}</button>
           <p className="text-white/45 text-xs">Nothing is sent until you press Send in your email.</p>
-          <button onClick={onClose} className="px-4 py-2.5 rounded-xl bg-white/10 justify-self-end">Done</button></div>
+          <button onClick={finish} className="px-5 py-2.5 rounded-xl bg-[#0F52BA] font-semibold justify-self-end">Done</button></div>
         ) : (<form onSubmit={submit} className="grid gap-5">
           <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-sm bg-white/[.04] rounded-2xl p-4">
             {selected.map((id, i) => <li key={id} className="flex items-center gap-2 min-w-0">
@@ -69,5 +71,5 @@ export default function SubmitModal({ selected, cap, vc, wk, account, onClose, o
           </div>
         </form>)}
       </div>
-    </motion.div></motion.div>);
-    }
+    </div></div>);
+              }
