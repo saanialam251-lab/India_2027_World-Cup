@@ -67,6 +67,9 @@ export default function App() {
     }, 2800);
   };
 
+  // Every send counts: each fan row carries how many times that fan has sent a squad.
+  const total = community.reduce((a, q) => a + (q.sends || 1), 0);
+
   const onLoggedIn = r => {
     const acc = { token: r.token, name: r.name, email: r.email, phone: r.phone };
     saveSession(acc); setSession(acc); setAuth(null);
@@ -197,7 +200,7 @@ export default function App() {
 
       <HeroM
         step={go ? 2 : ready ? 1 : 0}
-        fans={community.length}
+        fans={total}
       />
 
       <main className="max-w-[1400px] mx-auto px-3 sm:px-4 pb-20 overflow-x-clip">
@@ -234,7 +237,7 @@ export default function App() {
         </div>
 
         {/* ANALYTICS */}
-        <AnalyticsM squads={community} />
+        <AnalyticsM squads={community} total={total} />
       </main>
 
       {/* TOAST */}
@@ -277,7 +280,7 @@ export default function App() {
           onSaved={(l) => { if (l.length) { setCommunity(l); saveCommunity(l); } else refreshStats(); }}
         />
       )}
-      {celebrate && <SquadCelebration squad={celebrate} fans={community.length} onClose={() => { setCelebrate(null); window.scrollTo(0, 0); }} />}
+      {celebrate && <SquadCelebration squad={celebrate} fans={total} onClose={() => { setCelebrate(null); window.scrollTo(0, 0); }} />}
     </>
   );
-      }
+            }
